@@ -36,17 +36,17 @@
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="182dp"
-                app:srcCompat="@drawable/Alzheimer" />
+                app:srcCompat="@drawable/alzheimer" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <AutoCompleteTextView
-                    android:id="@+id/login_username"
+                    android:id="@+id/login_name_editText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/prompt_email"
+                    android:hint="@string/prompt_name"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true" />
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/login_password"
+                    android:id="@+id/login_password_editText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password"
@@ -72,8 +72,7 @@
             </android.support.design.widget.TextInputLayout>
 
             <Button
-                android:id="@+id/email_sign_in_button"
-                style="?android:textAppearanceSmall"
+                android:id="@+id/login_sign_in_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -88,7 +87,8 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Menu" />
 
             <Button
-                android:id="@+id/register_button"
+                android:id="@+id/login_register_button"
+                style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/action_register" />

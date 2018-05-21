@@ -3,8 +3,10 @@ package com.example.theopoipoi.alzheimer_project;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.UserManager;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -23,26 +25,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // User Table Columns names
     private static final String COLUMN_USER_NAME = "user_name";
+    private static final String COLUMN_USER_FIRSTNAME = "user_firstname";
     private static final String COLUMN_USER_PASSWORD = "user_password";
-    private static final String COLUMN_USER_BATTERY_MIN = "user_battery_min";
-    private static final String COLUMN_USER_BATTERY_MAX = "user_battery_max";
-    private static final String COLUMN_USER_TEMPERATURE_MIN = "user_temperature_min";
-    private static final String COLUMN_USER_TEMPERATURE_MAX = "user_temperature_max";
-    private static final String COLUMN_USER_HUMIDITY_MIN = "user_humidity_min";
-    private static final String COLUMN_USER_HUMIDITY_MAX = "user_humidity_max";
+    private static final String COLUMN_USER_ADDRESS = "user_address";
     private static final String COLUMN_USER_PHONE = "user_phone";
 
     // create table sql query
     private String CREATE_USER_TABLE = "CREATE TABLE " + TABLE_USER + " ("
-            + COLUMN_USER_NAME + " VARCHAR PRIMARY KEY,"
+            + COLUMN_USER_NAME + " VARCHAR PRIMARY KEY not null,"
+            + COLUMN_USER_FIRSTNAME + " VARCHAR not null,"
             + COLUMN_USER_PASSWORD + " INT(4) not null,"
-            + COLUMN_USER_BATTERY_MAX + " INT,"
-            + COLUMN_USER_BATTERY_MIN + " INT,"
-            + COLUMN_USER_TEMPERATURE_MAX + " INT,"
-            + COLUMN_USER_TEMPERATURE_MIN + " INT,"
-            + COLUMN_USER_HUMIDITY_MAX + " INT,"
-            + COLUMN_USER_HUMIDITY_MIN + " INT,"
-            + COLUMN_USER_PHONE + " VARCHAR"
+            + COLUMN_USER_ADDRESS + " VARCHAR not null,"
+            + COLUMN_USER_PHONE + " VARCHAR not null"
             + ")";
 
     // drop table sql query
@@ -83,8 +77,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(COLUMN_USER_NAME, user.getUsername());
+        values.put(COLUMN_USER_NAME, user.getName());
         values.put(COLUMN_USER_PASSWORD, user.getPassword());
+        values.put(COLUMN_USER_PHONE, user.getPhone());
+        values.put(COLUMN_USER_ADDRESS, user.getAddress());
+        values.put(COLUMN_USER_FIRSTNAME, user.getFirstname());
 
         // Inserting Row
         db.insert(TABLE_USER, null, values);
@@ -102,7 +99,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] columns = {
                 COLUMN_USER_NAME,
                 COLUMN_USER_PASSWORD,
-                COLUMN_USER_TEMPERATURE_MIN,
         };
         // sorting orders
         String sortOrder =
@@ -130,7 +126,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 User user = new User();
-                user.setUsername(cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME)));
+                user.setName(cursor.getString(cursor.getColumnIndex(COLUMN_USER_NAME)));
                 user.setPassword(Integer.parseInt(cursor.getString(cursor.getColumnIndex(COLUMN_USER_PASSWORD))));
                 // Adding user record to list
                 userList.add(user);
@@ -148,7 +144,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @param user
      */
-    public void updateUser(User user) {
+    /*public void updateUser(User user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -165,7 +161,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.update(TABLE_USER, values, COLUMN_USER_NAME + "= ?", new String[]{String.valueOf(user.getUsername())});
         db.close();
     }
-
+*/
     /**
      * This method is to delete user record
      *
@@ -175,11 +171,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         // delete user record by id
         db.delete(TABLE_USER, COLUMN_USER_NAME + " = ?",
-                new String[]{String.valueOf(user.getUsername())});
+                new String[]{String.valueOf(user.getName())});
         db.close();
     }
 
 
+    public boolean checkPassword(String username, String password) throws SQLException
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor mCursor = db.rawQuery("SELECT * FROM " + TABLE_USER + " WHERE " + COLUMN_USER_NAME + " = ? AND " + COLUMN_USER_PASSWORD + " = ?", new String[]{username,password});
+        if (mCursor != null) {
+            if(mCursor.getCount() > 0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 
