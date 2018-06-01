@@ -4,8 +4,10 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
+import android.media.midi.MidiManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -18,6 +20,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -55,19 +58,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        DatabaseHelper = new DatabaseHelper(this);
         //Obtain my position
+        mMap.setMyLocationEnabled(true);
 
         // Add a marker in the address of the user
         Log.w("Name", getIntent().getStringExtra("name"));
         Log.w("Addresse :",DatabaseHelper.getAddress(getIntent().getStringExtra("name")));
-        //LatLng LatlngUser = getLocationFromAddress(getApplicationContext(), getIntent().getStringExtra("name"));
-        //mMap.addMarker(new MarkerOptions().position(LatlngUser).title("Marker in my address"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(LatlngUser));
+        LatLng LatlngUser = getLocationFromAddress(getApplicationContext(), DatabaseHelper.getAddress(getIntent().getStringExtra("name")));
+        mMap.addMarker(new MarkerOptions().position(LatlngUser).title("Marker in my address"));
+        drawCircle(LatlngUser);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatlngUser, 300));
 
-        /*// Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
     }
 
     public LatLng getLocationFromAddress(Context context, String inputtedAddress) {
@@ -101,4 +103,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         return resLatLng;
     }
+
+    private void drawCircle(LatLng point){
+
+
+        // Instantiating CircleOptions to draw a circle around the marker
+        CircleOptions circleOptions = new CircleOptions();
+
+        // Specifying the center of the circle
+        circleOptions.center(point);
+
+        // Radius of the circle
+        circleOptions.radius(20);
+
+        // Border color of the circle
+        circleOptions.strokeColor(Color.GREEN);
+
+        // Fill color of the circle
+        circleOptions.fillColor(0x30ff0000);
+
+        // Border width of the circle
+        circleOptions.strokeWidth(2);
+
+        // Adding the circle to the GoogleMap
+        mMap.addCircle(circleOptions);
+
+    }
+
 }

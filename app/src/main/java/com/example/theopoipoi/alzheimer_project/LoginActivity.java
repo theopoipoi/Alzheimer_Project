@@ -40,7 +40,6 @@ public class LoginActivity extends AppCompatActivity {
         DatabaseHelper = new DatabaseHelper(this);
         initViews();
         //intent = new Intent(getApplicationContext(), SecondActivity.class);
-        getApplicationContext().deleteDatabase(UserManager.db);
 
         //set click event of login button
         sign_in_button.setOnClickListener(new View.OnClickListener() {
