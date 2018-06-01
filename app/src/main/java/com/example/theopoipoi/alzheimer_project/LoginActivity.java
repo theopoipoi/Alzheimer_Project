@@ -3,6 +3,7 @@ package com.example.theopoipoi.alzheimer_project;
 
 import android.content.Intent;
 
+import android.os.UserManager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -39,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
         DatabaseHelper = new DatabaseHelper(this);
         initViews();
         //intent = new Intent(getApplicationContext(), SecondActivity.class);
-
+        getApplicationContext().deleteDatabase(UserManager.db);
 
         //set click event of login button
         sign_in_button.setOnClickListener(new View.OnClickListener() {
