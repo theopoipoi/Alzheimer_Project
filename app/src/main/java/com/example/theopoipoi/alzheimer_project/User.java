@@ -48,4 +48,6 @@ public class User {
     public void setPassword(int password) {
         this.password = password;
     }
+
+
 }

@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Address;
 import android.os.UserManager;
 import android.util.Log;
 
@@ -254,6 +255,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+/*    //This method is used to get the address of a user
+    public String getAddress(int index,String username){
+        String res = new String() ;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("Select * FROM " + TABLE_USER + " WHERE " + COLUMN_USER_NAME + " = ?", new String [] {username});
+        if (cursor.moveToFirst()) {
+            res = cursor.getString(index);
+        }
+        Log.w("Address :", res);
+        cursor.close();
+        db.close();
+
+        return res;
+
+    }*/
+
+    public String getAddress (String username) {
+        String address = new String();
+        SQLiteDatabase db = this.getWritableDatabase();
+        //Cursor cursor = db.rawQuery(query, null);
+        Cursor cursor = db.rawQuery("Select "+ COLUMN_USER_ADDRESS + " FROM " + TABLE_USER + " WHERE " + COLUMN_USER_NAME + " = ?", new String [] {username});
+        if (cursor.moveToFirst()) {
+            address = cursor.getString(cursor.getColumnIndex(COLUMN_USER_ADDRESS));
+        }
+        Log.w("Address :", address);
+        cursor.close();
+        db.close();
+        return address;
+    }
 
 
     public String getNumber (String username) {

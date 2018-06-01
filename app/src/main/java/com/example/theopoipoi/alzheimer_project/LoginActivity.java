@@ -64,6 +64,9 @@ public class LoginActivity extends AppCompatActivity {
                     if (DatabaseHelper.checkPassword(Username, Password)) {
 
                         Toast.makeText(getApplicationContext(), "Successfully Logged in!", Toast.LENGTH_SHORT).show();
+                        intent=new Intent(getApplicationContext(), MapsActivity.class);
+                        intent.putExtra("name", Username);
+                        startActivity(intent);
 
                     } else {
                         Toast.makeText(getApplicationContext(), "Name or password incorrect", Toast.LENGTH_SHORT).show();
