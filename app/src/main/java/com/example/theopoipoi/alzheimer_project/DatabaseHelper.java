@@ -275,9 +275,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String address = new String();
         SQLiteDatabase db = this.getWritableDatabase();
         //Cursor cursor = db.rawQuery(query, null);
-        Log.w("On est avant la requête", "Avant la requêe");
         Cursor cursor = db.rawQuery("Select * FROM " + TABLE_USER + " WHERE " + COLUMN_USER_NAME + " = ? ", new String [] {username});
-        Log.w("On est après la requête", "Après la requêe");
         if (cursor.moveToFirst()) {
             address = cursor.getString(cursor.getColumnIndex(COLUMN_USER_ADDRESS));
         }
