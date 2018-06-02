@@ -53,6 +53,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
+
+
     private boolean mLocationPermissionGranted;
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
@@ -64,7 +66,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 15;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS =0 ;
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS =3 ;
 
     private Location mLastKnownLocation;
     private CircleOptions circleOptions;
@@ -85,8 +87,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         circleOptions=new CircleOptions();
 
 
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -94,10 +94,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                LOCATION_PERMISSION_REQUEST_CODE);
-
+        getSMSPermission();
 
 
         //checkLocationPermission();
@@ -106,6 +103,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Prompt the user for permission.
         getLocationPermission();
+
 
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
@@ -118,8 +116,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Toast.makeText(getBaseContext(), mLastKnownLocation.getLatitude(), Toast.LENGTH_LONG).show();
 
         //setUpMapIfNeeded();
-
-
 
 
 
@@ -141,14 +137,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         handler.post(runnableCode);
 
 
-
-
-
-
-
-
-
     }
+
 
 
     /**
@@ -293,6 +283,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    private void getSMSPermission () {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.SEND_SMS)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.SEND_SMS},
+                        MY_PERMISSIONS_REQUEST_SEND_SMS);
+            }
+        }
+    }
+
     /**
      * Handles the result of the request for location permissions.
      */
@@ -315,15 +319,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case MY_PERMISSIONS_REQUEST_SEND_SMS: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    SmsManager smsManager = SmsManager.getDefault();
+                    /*SmsManager smsManager = SmsManager.getDefault();
                     smsManager.sendTextMessage(phoneNo, null, message, null, null);
                     Toast.makeText(getApplicationContext(), "SMS sent.",
-                            Toast.LENGTH_LONG).show();
+                            Toast.LENGTH_LONG).show();*/
                 } else {
                     Toast.makeText(getApplicationContext(),
                             "SMS failed, please try again.", Toast.LENGTH_LONG).show();
                     return;
                 }
+
             }
         }
         updateLocationUI();
@@ -351,6 +356,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void IsOnCircle(CircleOptions circle) {
         final float[] distance = new float[2];
         final CircleOptions circl = circle;
+
         try {
             if (mLocationPermissionGranted) {
                 Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
@@ -404,7 +410,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         MY_PERMISSIONS_REQUEST_SEND_SMS);
             }
         }
+        else {
+            DatabaseHelper DatabaseHelper = new DatabaseHelper(this);
+            String phoneNo = DatabaseHelper.getNumber(getIntent().getStringExtra("name"));
+            String message = "The patient is out of the zone";
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(phoneNo, null, message, null, null);
+            Toast.makeText(getApplicationContext(), "SMS sent.",
+                    Toast.LENGTH_LONG).show();
+        }
     }
 
 
     }
+
