@@ -71,9 +71,6 @@ public class LoginActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(getApplicationContext(), "Name or password incorrect", Toast.LENGTH_SHORT).show();
                     }
-                    //Send the name to the next Activity
-                    //intent.putExtra("name", currentUser.getName());
-                    //startActivity(intent);
                 }
 
 
@@ -82,6 +79,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        //If the user want to register, he will be redirected to the register screen
         register_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 intent = new Intent(getApplicationContext(), RegistrationActivity.class);

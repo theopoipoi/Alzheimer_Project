@@ -140,29 +140,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return userList;
     }
 
-    /**
-     * This method to update user record
-     *
-     * @param user
-     */
-    /*public void updateUser(User user) {
-        SQLiteDatabase db = this.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_USER_TEMPERATURE_MAX, user.getTemperature_max());
-        values.put(COLUMN_USER_TEMPERATURE_MIN, user.getTemperature_min());
-        values.put(COLUMN_USER_BATTERY_MAX, user.getBattery_max());
-        values.put(COLUMN_USER_BATTERY_MIN, user.getBattery_min());
-        values.put(COLUMN_USER_HUMIDITY_MAX, user.getHumidity_max());
-        values.put(COLUMN_USER_HUMIDITY_MIN, user.getHumidity_min());
-        values.put(COLUMN_USER_PHONE, user.getPhone());
-
-
-        // updating row
-        db.update(TABLE_USER, values, COLUMN_USER_NAME + "= ?", new String[]{String.valueOf(user.getUsername())});
-        db.close();
-    }
-*/
     /**
      * This method is to delete user record
      *
@@ -176,7 +154,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-
+    //Check if it is the right password
     public boolean checkPassword(String username, String password) throws SQLException
     {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -255,26 +233,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-/*    //This method is used to get the address of a user
-    public String getAddress(int index,String username){
-        String res = new String() ;
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("Select * FROM " + TABLE_USER + " WHERE " + COLUMN_USER_NAME + " = ?", new String [] {username});
-        if (cursor.moveToFirst()) {
-            res = cursor.getString(index);
-        }
-        Log.w("Address :", res);
-        cursor.close();
-        db.close();
-
-        return res;
-
-    }*/
-
+    //Get the address of the user
     public String getAddress (String username) {
         String address = new String();
         SQLiteDatabase db = this.getWritableDatabase();
-        //Cursor cursor = db.rawQuery(query, null);
         Cursor cursor = db.rawQuery("Select * FROM " + TABLE_USER + " WHERE " + COLUMN_USER_NAME + " = ? ", new String [] {username});
         if (cursor.moveToFirst()) {
             address = cursor.getString(cursor.getColumnIndex(COLUMN_USER_ADDRESS));
@@ -285,11 +247,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return address;
     }
 
-
+    //Get the number of the user
     public String getNumber (String username) {
         String numb = new String();
         SQLiteDatabase db = this.getWritableDatabase();
-        //Cursor cursor = db.rawQuery(query, null);
         Cursor cursor = db.rawQuery("Select "+ COLUMN_USER_PHONE + " FROM " + TABLE_USER + " WHERE " + COLUMN_USER_NAME + " = ?", new String [] {username});
         if (cursor.moveToFirst()) {
             numb = cursor.getString(cursor.getColumnIndex(COLUMN_USER_PHONE));

@@ -47,11 +47,10 @@ import java.util.TimerTask;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+
     private static final String TAG = MapsActivity.class.getSimpleName();
     private GoogleMap mMap;
     private CameraPosition mCameraPosition;
-
-    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
 
 
 
@@ -65,6 +64,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // not granted.
     private final LatLng mDefaultLocation = new LatLng(-33.8523341, 151.2106085);
     private static final int DEFAULT_ZOOM = 15;
+
+    //initialize the values of the request permissions
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int MY_PERMISSIONS_REQUEST_SEND_SMS =3 ;
 
@@ -79,11 +80,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        //Get the last known position of the user and of the camera
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             mCameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
 
+        //Instantiate de circle that will define the zone which the user must stay
         circleOptions=new CircleOptions();
 
 
@@ -94,6 +97,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        //Get the SMS permission to send SMS from the phone of the user
         getSMSPermission();
 
 
@@ -108,14 +112,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Turn on the My Location layer and the related control on the map.
         updateLocationUI();
 
-        // Get the current location of the device and set the position of the map.
-        mLastKnownLocation=MoveCamera();
-
-        updateLocationUI();
-
-        //Toast.makeText(getBaseContext(), mLastKnownLocation.getLatitude(), Toast.LENGTH_LONG).show();
-
-        //setUpMapIfNeeded();
+        //Move the camera to the user
+        MoveCamera();
 
 
 
@@ -125,12 +123,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Runnable runnableCode = new Runnable() {
             @Override
             public void run() {
+                //Check if the user is in the circle
                 IsOnCircle(circleOptions);
-                // Do something here on the main thread
+                //Update the location of the user
+                updateLocationUI();
+                // Send a message to the Logcat
                 Log.d("Handlers", "Called on main thread");
-                // Repeat this the same runnable code block again another 2 seconds
+                // Repeat this the same runnable code block again another 20 seconds
                 // 'this' is referencing the Runnable object
-                handler.postDelayed(this, 20000);
+                handler.postDelayed(this, 20000); //20 000 milliseconds = 20 secondes
             }
         };
         // Start the initial runnable task by posting through the handler
@@ -210,7 +211,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         circleOptions.center(point);
 
         // Radius of the circle
-        circleOptions.radius(40);
+        circleOptions.radius(100);
 
         // Border color of the circle
         circleOptions.strokeColor(Color.GREEN);
@@ -229,10 +230,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-    private Location MoveCamera() {
+    private void MoveCamera() {
         /*
-         * Get the best and most recent location of the device, which may be null in rare
-         * cases when a location is not available.
+         * Zoom the camera to the last position of the user
          */
         try {
             if (mLocationPermissionGranted) {
@@ -249,6 +249,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
+                            //If it failed, move the camera to the default location
                             mMap.moveCamera(CameraUpdateFactory
                                     .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
                             mMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -260,7 +261,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
-        return mLastKnownLocation;
     }
 
     /**
@@ -284,6 +284,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getSMSPermission () {
+        //Request SMS permission
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -319,10 +320,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case MY_PERMISSIONS_REQUEST_SEND_SMS: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    /*SmsManager smsManager = SmsManager.getDefault();
-                    smsManager.sendTextMessage(phoneNo, null, message, null, null);
-                    Toast.makeText(getApplicationContext(), "SMS sent.",
-                            Toast.LENGTH_LONG).show();*/
                 } else {
                     Toast.makeText(getApplicationContext(),
                             "SMS failed, please try again.", Toast.LENGTH_LONG).show();
@@ -334,6 +331,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         updateLocationUI();
     }
 
+
+//Update the location of the user
+    //Activate the Location Button or not
     private void updateLocationUI() {
         if (mMap == null) {
             return;
@@ -353,10 +353,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    //Check if the user is on the circle
     private void IsOnCircle(CircleOptions circle) {
         final float[] distance = new float[2];
         final CircleOptions circl = circle;
 
+        //get the last postion of the user
         try {
             if (mLocationPermissionGranted) {
                 Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
@@ -367,15 +369,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
 
-                            Toast.makeText(getBaseContext(), "Is on circle", Toast.LENGTH_LONG).show();
-                            LatLng latlng = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
-                            MarkerOptions markerPosition = new MarkerOptions().position(latlng);
+                            //LatLng latlng = new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude());
+                            //MarkerOptions markerPosition = new MarkerOptions().position(latlng);
 
-                            Location.distanceBetween(markerPosition.getPosition().latitude, markerPosition.getPosition().longitude,
+                            //Check the distance between the user and the circle
+                            Location.distanceBetween(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(),
                                     circl.getCenter().latitude, circl.getCenter().longitude, distance);
 
+                            //Send the toast to specify if the user is inside the circle or outside
                             if (distance[0] > circl.getRadius()) {
                                 Toast.makeText(getBaseContext(), "Outside", Toast.LENGTH_LONG).show();
+                                //If the user is outside the circle, send a message to the urgency number specified in the registration
                                 sendSMSMessage();
                             } else {
                                 Toast.makeText(getBaseContext(), "Inside", Toast.LENGTH_LONG).show();
@@ -383,8 +387,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
+                            //Move the camera to the default location
                             mMap.moveCamera(CameraUpdateFactory
                                     .newLatLngZoom(mDefaultLocation, DEFAULT_ZOOM));
+                            //The position button is not enabled
                             mMap.getUiSettings().setMyLocationButtonEnabled(false);
                         }
                     }
@@ -397,8 +403,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
 
+        // Send a message to the urgency number
     protected void sendSMSMessage() {
 
+        //Check if the application has the permission to send SMS, if not it made a request
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -411,10 +419,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
         else {
+            //If the application has the permission
             DatabaseHelper DatabaseHelper = new DatabaseHelper(this);
+            //Get the phone number from the database
             String phoneNo = DatabaseHelper.getNumber(getIntent().getStringExtra("name"));
+            //Specify the send message
             String message = "The patient is out of the zone";
             SmsManager smsManager = SmsManager.getDefault();
+            //Send the message to the urgency number
             smsManager.sendTextMessage(phoneNo, null, message, null, null);
             Toast.makeText(getApplicationContext(), "SMS sent.",
                     Toast.LENGTH_LONG).show();

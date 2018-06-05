@@ -41,7 +41,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 String Firstname = edit_text_firstname.getText().toString();
                 String address = edit_text_address.getText().toString();
                 String phone = edit_text_phone.getText().toString();
-                //Check if the password has the right length
+                //Check if the password has the right length and all the fields are completed
                 if(Name.matches("")|| Password.length() != 4 || Firstname.matches("") || address.matches("") || phone.matches("")) {
                     Toast.makeText(getApplicationContext(), "Unsuccessfull request, please fill in all the fields", Toast.LENGTH_SHORT).show();
                 }
@@ -60,7 +60,7 @@ public class RegistrationActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(getApplicationContext(), "Successfully Sign in!", Toast.LENGTH_SHORT).show();
                         DatabaseHelper.addUser(currentUser);
-                        //Send the name to the next Activity
+                        //Send the name to the next Activity (Login)
                         //intent.putExtra("name", currentUser.getName());
                         intent = new Intent(getApplicationContext(), LoginActivity.class);
                         startActivity(intent);
@@ -75,6 +75,7 @@ public class RegistrationActivity extends AppCompatActivity {
         });
     }
 
+    //this method is used to connect XML views to its Objects
     private void initViews() {
         edit_text_name = (EditText)findViewById(R.id.registration_editText_name);
         edit_text_firstname = (EditText)findViewById(R.id.editText_firstname);
